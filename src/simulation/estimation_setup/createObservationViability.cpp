@@ -167,6 +167,33 @@ std::shared_ptr< OccultationCalculator > createOccultationCalculator(
             occultingBodyRadius );
 }
 
+std::shared_ptr< CustomViabilityCalculator > createCustomViabilityCalculator(
+        const simulation_setup::SystemOfBodies& bodies,
+        const LinkEnds linkEnds,
+        const ObservableType observationType,
+        const std::shared_ptr< CustomObservationViabilitySettings > observationViabilitySettings )
+{
+    if( observationViabilitySettings->observationViabilityType_ != custom_viability )
+    {
+        throw std::runtime_error( "Error when making occultation calculator, inconsistent input" );
+    }
+
+    if( bodies.count( observationViabilitySettings->getAssociatedLinkEnd( ).first ) == 0 )
+    {
+        throw std::runtime_error( "Error when making minimum elevation angle calculator, body " +
+                                  observationViabilitySettings->getAssociatedLinkEnd( ).first + " not found." );
+    }
+    if( bodies.count( observationViabilitySettings->getAssociatedLinkEnd( ).second ) == 0 )
+    {
+        throw std::runtime_error( "Error when making minimum elevation angle calculator, body " +
+                                  observationViabilitySettings->getAssociatedLinkEnd( ).second + " not found." );
+    }
+
+    return std::make_shared< CustomViabilityCalculator >(
+            getLinkStateAndTimeIndicesForLinkEnd( linkEnds, observationType, observationViabilitySettings->getAssociatedLinkEnd( ) ),
+            observationViabilitySettings->getCustomViabilityFunction( ) );
+}
+
 //! Function to create an list of obervation viability conditions for a single set of link ends
 std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservationViabilityCalculators(
         const simulation_setup::SystemOfBodies& bodies,
