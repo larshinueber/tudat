@@ -172,7 +172,20 @@ inline std::shared_ptr< ObservationViabilitySettings > bodyOccultationViabilityS
     return std::make_shared< ObservationViabilitySettings >( body_occultation, associatedLinkEnd, occultingBody );
 }
 
-inline std::shared_ptr< ObservationViabilitySettings > customObservationViabilitySettings(
+inline std::vector< std::shared_ptr< CustomObservationViabilitySettings > > customObservationViabilitySettings(
+        const std::vector< std::pair< std::string, std::string > > associatedLinkEnds,
+        const std::function< bool( const std::vector< Eigen::Vector6d >, const std::vector< double > ) > customViabilityFunction )
+{
+    std::vector< std::shared_ptr< CustomObservationViabilitySettings > > viabilitySettingsList;
+    for( unsigned int i = 0; i < associatedLinkEnds.size( ); i++ )
+    {
+        viabilitySettingsList.push_back(
+                std::make_shared< CustomObservationViabilitySettings >( associatedLinkEnds.at( i ), customViabilityFunction ) );
+    }
+    return viabilitySettingsList;
+}
+
+inline std::shared_ptr< CustomObservationViabilitySettings > customObservationViabilitySettings(
         const std::pair< std::string, std::string > associatedLinkEnd,
         const std::function< bool( const std::vector< Eigen::Vector6d >, const std::vector< double > ) > customViabilityFunction )
 {
