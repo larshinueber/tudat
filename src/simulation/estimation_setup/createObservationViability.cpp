@@ -175,19 +175,19 @@ std::shared_ptr< CustomViabilityCalculator > createCustomViabilityCalculator(
 {
     if( observationViabilitySettings->observationViabilityType_ != custom_viability )
     {
-        throw std::runtime_error( "Error when making occultation calculator, inconsistent input" );
+        throw std::runtime_error( "Error when making custom viability calculator, inconsistent input" );
     }
 
     if( bodies.count( observationViabilitySettings->getAssociatedLinkEnd( ).first ) == 0 )
     {
-        throw std::runtime_error( "Error when making minimum elevation angle calculator, body " +
+        throw std::runtime_error( "Error when making custom viability calculator, body " +
                                   observationViabilitySettings->getAssociatedLinkEnd( ).first + " not found." );
     }
-    if( bodies.count( observationViabilitySettings->getAssociatedLinkEnd( ).second ) == 0 )
-    {
-        throw std::runtime_error( "Error when making minimum elevation angle calculator, body " +
-                                  observationViabilitySettings->getAssociatedLinkEnd( ).second + " not found." );
-    }
+    // if( bodies.count( observationViabilitySettings->getAssociatedLinkEnd( ).second ) == 0 )
+    // {
+    //     throw std::runtime_error( "Error when making custom viability calculator, body " +
+    //                               observationViabilitySettings->getAssociatedLinkEnd( ).second + " not found." );
+    // }
 
     return std::make_shared< CustomViabilityCalculator >(
             getLinkStateAndTimeIndicesForLinkEnd( linkEnds, observationType, observationViabilitySettings->getAssociatedLinkEnd( ) ),
@@ -246,6 +246,18 @@ std::vector< std::shared_ptr< ObservationViabilityCalculator > > createObservati
                 linkViabilityCalculators.push_back(
                         createOccultationCalculator( bodies, linkEnds, observationType, relevantObservationViabilitySettings.at( i ) ) );
                 break;
+
+            case custom_viability:
+
+                std::cout << "creating custom viability calculator" << std::endl;
+
+                linkViabilityCalculators.push_back( createCustomViabilityCalculator(
+                        bodies,
+                        linkEnds,
+                        observationType,
+                        std::static_pointer_cast< CustomObservationViabilitySettings >( relevantObservationViabilitySettings.at( i ) ) ) );
+                break;
+
             default:
                 throw std::runtime_error( "Error when making observation viability calculator, type not recognized " +
                                           std::to_string( relevantObservationViabilitySettings.at( i )->observationViabilityType_ ) );

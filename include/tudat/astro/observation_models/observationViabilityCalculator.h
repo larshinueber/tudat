@@ -39,7 +39,7 @@ enum ObservationViabilityType {
     minimum_elevation_angle,  // properties: no string, double = elevation angle
     body_avoidance_angle,     // properties: string = body to avoid, double = avoidance angle
     body_occultation,         // properties: string = occulting body, no double
-    custom_viability
+    custom_viability,
 };
 
 //! Base class for determining whether an observation is possible or not
@@ -307,7 +307,9 @@ public:
             const std::vector< std::pair< int, int > > linkEndIndices,
             const std::function< bool( const std::vector< Eigen::Vector6d >, std::vector< double > ) > customViabilityFunction ):
         linkEndIndices_( linkEndIndices ), customViabilityFunction_( customViabilityFunction )
-    { }
+    {
+        std::cout << "Custom viability calculator created." << std::endl;
+    }
 
     bool isObservationViable( const std::vector< Eigen::Vector6d >& linkEndStates, const std::vector< double >& linkEndTimes );
 
