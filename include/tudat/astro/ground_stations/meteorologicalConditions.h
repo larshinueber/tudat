@@ -244,7 +244,9 @@ public:
     InterpolatedStationTroposphereData(
             const std::shared_ptr< interpolators::OneDimensionalInterpolator< double, Eigen::VectorXd > > troposphereInterpolator,
             const bool dataHasMappingFunction,
-            const bool dataHasGradient ): gradientStartIndex_( dataHasMappingFunction ? 4 : 2 )
+            const bool dataHasGradient ):
+        troposphereInterpolator_( troposphereInterpolator ), dataHasMappingFunction_( dataHasMappingFunction ),
+        dataHasGradient_( dataHasGradient ), gradientStartIndex_( dataHasMappingFunction ? 4 : 2 ), currentUtc_( TUDAT_NAN )
     { }
 
     ~InterpolatedStationTroposphereData( ) { }
@@ -252,7 +254,7 @@ public:
     Eigen::Vector2d getZenithDelay( const double currentUtc )
     {
         updateData( currentUtc );
-        return currentData_.segment( 0, 2 );
+        return currentData_.segment( 2, 2 );
     }
 
     Eigen::Vector2d getMappingFunction( const double currentUtc )
@@ -265,7 +267,7 @@ public:
         {
             throw std::runtime_error( "Error when retrieving mapping function, no data set." );
         }
-        return currentData_.segment( 2, 2 );
+        return currentData_.segment( 0, 2 );
     }
 
     Eigen::Vector4d getGradient( const double currentUtc )
@@ -278,7 +280,12 @@ public:
         {
             throw std::runtime_error( "Error when retrieving mapping function, no data set." );
         }
-        return currentData_.segment( gradientStartIndex_, 2 );
+        return currentData_.segment( gradientStartIndex_, 4 );
+    }
+
+    bool hasGradientData( ) const
+    {
+        return dataHasGradient_;
     }
 
 private:
